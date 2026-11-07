@@ -82,7 +82,7 @@ fun Sidebar(page:String,go:(String)->Unit){
   Spacer(Modifier.weight(1f))
   Nav("Library",Icons.Default.Folder,false){}
   Nav("Settings",Icons.Default.Settings,false){}
-  Row(verticalAlignment=Alignment.CenterVertically){Text("Dark Mode",color=Color.LightGray,fontSize=9.sp);Switch(true,{},modifier=Modifier.scale(.55f))}
+  Row(verticalAlignment=Alignment.CenterVertically){Text("Dark Mode",color=Color.LightGray,fontSize=9.sp);Switch(checked = true, onCheckedChange = {}, modifier = Modifier.scale(.55f))}
  }
 }
 @Composable
@@ -96,7 +96,15 @@ fun Nav(name:String,icon:ImageVector,active:Boolean,onClick:()->Unit){
 fun TopBar(){
  Row(Modifier.fillMaxWidth().height(50.dp),verticalAlignment=Alignment.CenterVertically){
   Spacer(Modifier.weight(1f))
-  OutlinedTextField("",{},placeholder={Text("Search anime...",fontSize=11.sp)},leadingIcon={Icon(Icons.Default.Search,null)},singleLine=true,shape=RoundedCornerShape(30.dp),modifier=Modifier.width(260.dp).height(46.dp))
+  OutlinedTextField(
+   value = "",
+   onValueChange = {},
+   placeholder = { Text("Search anime...", fontSize = 11.sp) },
+   leadingIcon = { Icon(Icons.Default.Search, null) },
+   singleLine = true,
+   shape = RoundedCornerShape(30.dp),
+   modifier = Modifier.width(260.dp).height(46.dp)
+  )
   IconButton({}){Icon(Icons.Default.Notifications,null,tint=TEXT)}
   Box(Modifier.size(38.dp).clip(RoundedCornerShape(50)).background(Brush.linearGradient(listOf(PURPLE,PINK))),contentAlignment=Alignment.Center){Text("A",color=TEXT,fontWeight=FontWeight.Bold)}
  }
