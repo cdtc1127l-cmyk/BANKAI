@@ -183,4 +183,15 @@ fun EpisodeManager(x:Anime,watched:Set<String>,toggle:(String)->Unit,back:()->Un
 fun launchPlayerPlaceholder(x:Anime,e:Int){ /* External VLC/MX launch is wired when an episode video URI is imported. */ }
 
 @Composable
+fun QuotePanel(m: Modifier){
+ Card(m,shape=RoundedCornerShape(18.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){
+  Column(Modifier.fillMaxWidth().height(180.dp).padding(18.dp),verticalArrangement=Arrangement.Center){
+   Text("“The strongest blade is the one that protects what matters.”",color=TEXT,fontSize=16.sp,fontWeight=FontWeight.Bold)
+   Spacer(Modifier.height(10.dp))
+   Text("— BANKAI",color=Color(0xFFE2B0FF),fontSize=10.sp,fontWeight=FontWeight.Bold)
+  }
+ }
+}
+
+@Composable
 fun Stats(a:List<Anime>){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){Text("Stats",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(10.dp));listOf("Total Anime" to a.size,"Watched Episodes" to a.sumOf{it.episode},"Watchlist" to a.count{it.status=="Watchlist"},"Weekly Anime" to a.size).forEach{p->Card(Modifier.fillMaxWidth().padding(bottom=8.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Row(Modifier.padding(18.dp)){Text(p.first,color=TEXT,modifier=Modifier.weight(1f));Text(p.second.toString(),color=TEXT,fontSize=20.sp,fontWeight=FontWeight.Bold)}}}}}
