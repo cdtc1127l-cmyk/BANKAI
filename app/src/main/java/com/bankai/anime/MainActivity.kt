@@ -43,7 +43,9 @@ class MainActivity:ComponentActivity(){
 
 @Composable
 fun BankaiApp(){
- var page by remember{mutableStateOf("Home")}\n var selectedAnime by remember{mutableStateOf<Anime?>(null)}\n var watched by remember{mutableStateOf(setOf<String>())}
+ var page by remember{mutableStateOf("Home")}
+ var selectedAnime by remember{mutableStateOf<Anime?>(null)}
+ var watched by remember{mutableStateOf(setOf<String>())}
  val anime=listOf(
   Anime("The Lost Demon",1,12,24,"https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1000",50,"Watching","Friday"),
   Anime("Shadow Academy",1,8,12,"https://images.unsplash.com/photo-1541560052-77ec1bbc09f7?w=1000",67,"Watching","Tuesday"),
@@ -56,12 +58,13 @@ fun BankaiApp(){
   Column(Modifier.fillMaxSize().padding(start=14.dp)){
    TopBar()
    Spacer(Modifier.height(10.dp))
-   when(page){
-    "Home"->Home(anime)
-    page=="My Anime"->Library(anime){selectedAnime=it}
-    page=="Episodes"->Episodes(anime){selectedAnime=it}
-    page=="Weekly"->Weekly(anime)
-    "Stats"->Stats(anime)
+   when {
+    selectedAnime != null -> EpisodeManager(selectedAnime!!, watched, { key -> watched = if (key in watched) watched - key else watched + key }, { selectedAnime = null })
+    page=="Home" -> Home(anime)
+    page=="My Anime" -> Library(anime){selectedAnime=it}
+    page=="Episodes" -> Episodes(anime){selectedAnime=it}
+    page=="Weekly" -> Weekly(anime)
+    page=="Stats" -> Stats(anime)
    }
   }
  }
