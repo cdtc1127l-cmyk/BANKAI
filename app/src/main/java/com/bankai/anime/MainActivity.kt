@@ -70,7 +70,7 @@ fun BankaiApp(){
 fun Sidebar(page:String,go:(String)->Unit){
  Column(Modifier.width(118.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp)).background(Color(0xB20C061D)).padding(9.dp)){
   Text("☁",fontSize=30.sp,color=Color.Red,modifier=Modifier.align(Alignment.CenterHorizontally))
-  Text("BANKAI",color=TEXT,fontSize=16.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))
+  Text("Anime Tracker",,color=TEXT,fontSize=15.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))
   Spacer(Modifier.height(16.dp))
   listOf("Home" to Icons.Default.Home,"My Anime" to Icons.Default.Star,"Episodes" to Icons.Default.PlayArrow,"Weekly" to Icons.Default.DateRange,"Stats" to Icons.Default.BarChart).forEach{item->
    Nav(item.first,item.second,page==item.first){go(item.first)}
@@ -100,14 +100,14 @@ fun TopBar(){
 @Composable
 fun Home(a:List<Anime>){
  Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){
-  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){Hero(a[0],Modifier.weight(1.75f));StatsCard(a,Modifier.weight(.75f))}
+  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.Top){Hero(a[0],Modifier.weight(1.8f));StatsCard(a,Modifier.weight(.65f))}
   Spacer(Modifier.height(12.dp))
   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)){
    Section("Recently Watched",a.take(2),Modifier.weight(1f))
    Section("New Episodes",a.drop(1).take(2),Modifier.weight(1f))
    WeeklyMini(a,Modifier.weight(1f))
   }
-  Spacer(Modifier.height(12.dp));Section("My Watchlist",a.filter{it.status=="Watchlist"},Modifier.fillMaxWidth())
+  Spacer(Modifier.height(12.dp)); Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalAlignment=Alignment.Top){Section("My Watchlist",a.filter{it.status=="Watchlist"},Modifier.weight(1.7f)); QuotePanel(Modifier.weight(.8f))}
  }
 }
 @Composable
