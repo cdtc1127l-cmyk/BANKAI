@@ -34,7 +34,7 @@ private val PURPLE=Color(0xFF7C22FF)
 private val PINK=Color(0xFFD52BFF)
 private val TEXT=Color(0xFFF7F1FF)
 
-data class Anime(val title:String,val season:Int,val episode:Int,val total:Int,val image:String,val progress:Int,val status:String,val weekly:String)
+data class Anime(val title:String,val season:Int,val episode:Int,val total:Int,val image:String,val progress:Int,val status:String,val weekly:String,var inWeekly:Boolean=true)
 
 class MainActivity:ComponentActivity(){
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{BankaiApp()}}
@@ -42,7 +42,7 @@ class MainActivity:ComponentActivity(){
 
 @Composable
 fun BankaiApp(){
- var page by remember{mutableStateOf("Home")}
+ var page by remember{mutableStateOf("Home")}\n var selectedAnime by remember{mutableStateOf<Anime?>(null)}\n var watched by remember{mutableStateOf(setOf<String>())}
  val anime=listOf(
   Anime("The Lost Demon",1,12,24,"https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1000",50,"Watching","Friday"),
   Anime("Shadow Academy",1,8,12,"https://images.unsplash.com/photo-1541560052-77ec1bbc09f7?w=1000",67,"Watching","Tuesday"),
@@ -57,9 +57,9 @@ fun BankaiApp(){
    Spacer(Modifier.height(10.dp))
    when(page){
     "Home"->Home(anime)
-    "My Anime"->Library(anime)
-    "Episodes"->Episodes(anime)
-    "Weekly"->Weekly(anime)
+    page=="My Anime"->Library(anime){selectedAnime=it}
+    page=="Episodes"->Episodes(anime){selectedAnime=it}
+    page=="Weekly"->Weekly(anime)
     "Stats"->Stats(anime)
    }
   }
@@ -70,7 +70,7 @@ fun BankaiApp(){
 fun Sidebar(page:String,go:(String)->Unit){
  Column(Modifier.width(118.dp).fillMaxHeight().clip(RoundedCornerShape(18.dp)).background(Color(0xB20C061D)).padding(9.dp)){
   Text("☁",fontSize=30.sp,color=Color.Red,modifier=Modifier.align(Alignment.CenterHorizontally))
-  Text("Anime Tracker",,color=TEXT,fontSize=15.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))
+  Text("Anime Tracker",color=TEXT,fontSize=15.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))
   Spacer(Modifier.height(16.dp))
   listOf("Home" to Icons.Default.Home,"My Anime" to Icons.Default.Star,"Episodes" to Icons.Default.PlayArrow,"Weekly" to Icons.Default.DateRange,"Stats" to Icons.Default.BarChart).forEach{item->
    Nav(item.first,item.second,page==item.first){go(item.first)}
@@ -138,10 +138,37 @@ fun CardItem(x:Anime){Card(Modifier.width(245.dp),shape=RoundedCornerShape(16.dp
 @Composable
 fun WeeklyMini(a:List<Anime>,m:Modifier){Card(m,shape=RoundedCornerShape(18.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Column(Modifier.padding(13.dp)){Text("Weekly Releases",color=TEXT,fontWeight=FontWeight.Bold,fontSize=14.sp);Row(Modifier.horizontalScroll(rememberScrollState())){a.take(5).forEach{x->Column(Modifier.width(70.dp),horizontalAlignment=Alignment.CenterHorizontally){Text(x.weekly,color=TEXT,fontSize=9.sp);AsyncImage(x.image,null,Modifier.size(53.dp).clip(RoundedCornerShape(9.dp)),contentScale=ContentScale.Crop)}}}}}}
 @Composable
-fun Library(a:List<Anime>){Column(Modifier.fillMaxSize()){Text("My Anime",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(12.dp));LazyRow(horizontalArrangement=Arrangement.spacedBy(12.dp)){items(a){x->Column(Modifier.width(145.dp)){AsyncImage(x.image,null,Modifier.height(195.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)),contentScale=ContentScale.Crop);Text(x.title,color=TEXT,fontWeight=FontWeight.Bold,maxLines=1,overflow=TextOverflow.Ellipsis);Text(x.status+" • "+x.progress+"%",color=Color.LightGray,fontSize=10.sp)}}}}}
+fun Library(a:List<Anime>,open:(Anime)->Unit){Column(Modifier.fillMaxSize()){Text("My Anime",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(12.dp));LazyRow(horizontalArrangement=Arrangement.spacedBy(12.dp)){items(a){x->Column(Modifier.width(145.dp)){AsyncImage(x.image,null,Modifier.height(195.dp).fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable{open(x)},contentScale=ContentScale.Crop);Text(x.title,color=TEXT,fontWeight=FontWeight.Bold,maxLines=1,overflow=TextOverflow.Ellipsis);Text(x.status+" • "+x.progress+"%",color=Color.LightGray,fontSize=10.sp)}}}}}
 @Composable
-fun Episodes(a:List<Anime>){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){Text("Episodes",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Text("Season • Episode • Video management",color=Color.LightGray);Spacer(Modifier.height(10.dp));a.forEach{x->Card(Modifier.fillMaxWidth().padding(bottom=8.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Column(Modifier.padding(13.dp)){Text(x.title,color=TEXT,fontWeight=FontWeight.Bold);Text("Season "+x.season+" • "+x.total+" episodes",color=Color.LightGray);Row(Modifier.horizontalScroll(rememberScrollState())){for(e in 1..minOf(x.total,12)){FilterChip(selected=e<=x.episode,onClick={},label={Text("E"+e,fontSize=9.sp)})}}}}}}}
+fun Episodes(a:List<Anime>,open:(Anime)->Unit){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){Text("Episodes",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Text("Season • Episode • Video management",color=Color.LightGray);Spacer(Modifier.height(10.dp));a.forEach{x->Card(Modifier.fillMaxWidth().padding(bottom=8.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Column(Modifier.padding(13.dp)){Text(x.title,color=TEXT,fontWeight=FontWeight.Bold,modifier=Modifier.clickable{open(x)});Text("Season "+x.season+" • "+x.total+" episodes",color=Color.LightGray);Row(Modifier.horizontalScroll(rememberScrollState())){for(e in 1..minOf(x.total,12)){FilterChip(selected=e<=x.episode,onClick={},label={Text("E"+e,fontSize=9.sp)})}}}}}}}
 @Composable
 fun Weekly(a:List<Anime>){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){Text("Weekly",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Text("Add or remove anime without deleting your library.",color=Color.LightGray);Spacer(Modifier.height(10.dp));a.forEach{x->Card(Modifier.fillMaxWidth().padding(bottom=8.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Row(Modifier.padding(11.dp),verticalAlignment=Alignment.CenterVertically){AsyncImage(x.image,null,Modifier.size(58.dp).clip(RoundedCornerShape(10.dp)),contentScale=ContentScale.Crop);Column(Modifier.weight(1f).padding(horizontal=10.dp)){Text(x.title,color=TEXT,fontWeight=FontWeight.Bold);Text(x.weekly,color=Color.LightGray)};OutlinedButton({}){Text("Remove")}}}}}}
+
+
+@Composable
+fun EpisodeManager(x:Anime,watched:Set<String>,toggle:(String)->Unit,back:()->Unit){
+ Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){
+  Row(verticalAlignment=Alignment.CenterVertically){IconButton(back){Icon(Icons.Default.ArrowBack,null,tint=TEXT)};Column{Text(x.title,color=TEXT,fontSize=25.sp,fontWeight=FontWeight.Bold);Text("Season "+x.season+" • "+x.total+" Episodes",color=Color.LightGray)}} 
+  Spacer(Modifier.height(10.dp))
+  Card(Modifier.fillMaxWidth(),shape=RoundedCornerShape(18.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){
+   Column(Modifier.padding(15.dp)){
+    Text("Episode Manager",color=TEXT,fontSize=15.sp,fontWeight=FontWeight.Bold)
+    Spacer(Modifier.height(8.dp))
+    for(e in 1..x.total){
+     val key=x.title+"-"+x.season+"-"+e
+     Row(Modifier.fillMaxWidth().padding(vertical=5.dp),verticalAlignment=Alignment.CenterVertically){
+      Box(Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).background(if(key in watched) Color(0xFF15D6A0) else Color(0xFF29104C)),contentAlignment=Alignment.Center){Text("E$e",color=TEXT,fontSize=10.sp,fontWeight=FontWeight.Bold)}
+      Column(Modifier.weight(1f).padding(horizontal=10.dp)){Text("Episode $e",color=TEXT,fontWeight=FontWeight.Bold);Text(if(key in watched)"Watched" else "Unwatched",color=if(key in watched) Color(0xFF54F5C2) else Color.LightGray,fontSize=9.sp)}
+      TextButton({toggle(key)}){Text(if(key in watched)"✓ Watched" else "Mark Watched",color=if(key in watched)Color(0xFF54F5C2) else TEXT,fontSize=9.sp)}
+      OutlinedButton({launchPlayerPlaceholder(x,e)},contentPadding=PaddingValues(horizontal=9.dp)){Text("▶",fontSize=10.sp)}
+     }
+    }
+   }
+  }
+ }
+}
+
+fun launchPlayerPlaceholder(x:Anime,e:Int){ /* External VLC/MX launch is wired when an episode video URI is imported. */ }
+
 @Composable
 fun Stats(a:List<Anime>){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())){Text("Stats",color=TEXT,fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(10.dp));listOf("Total Anime" to a.size,"Watched Episodes" to a.sumOf{it.episode},"Watchlist" to a.count{it.status=="Watchlist"},"Weekly Anime" to a.size).forEach{p->Card(Modifier.fillMaxWidth().padding(bottom=8.dp),colors=CardDefaults.cardColors(containerColor=PANEL)){Row(Modifier.padding(18.dp)){Text(p.first,color=TEXT,modifier=Modifier.weight(1f));Text(p.second.toString(),color=TEXT,fontSize=20.sp,fontWeight=FontWeight.Bold)}}}}}
