@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -559,7 +559,7 @@ private fun LibraryScreen(library: List<AnimeRecord>, onOpen: (AnimeRecord) -> U
             horizontalArrangement = Arrangement.spacedBy(13.dp),
             verticalArrangement = Arrangement.spacedBy(17.dp)
         ) {
-            items(library, key = { it.id }) { anime -> PosterTile(anime, Modifier.fillMaxWidth()) { onOpen(anime) } }
+            gridItems(library, key = { it.id }) { anime -> PosterTile(anime, Modifier.fillMaxWidth()) { onOpen(anime) } }
         }
     }
 }
