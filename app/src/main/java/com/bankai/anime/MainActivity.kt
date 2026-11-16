@@ -890,7 +890,7 @@ private fun VideoPlayerScreen(item: PlayingEpisode, onBack: () -> Unit, onExtern
         AndroidView(
             factory = { viewContext ->
                 PlayerView(viewContext).apply {
-                    player = this@VideoPlayerScreen.player
+                    this.player = player
                     useController = true
                     setShowBuffering(PlayerView.SHOW_BUFFERING_WHEN_PLAYING)
                 }
